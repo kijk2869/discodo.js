@@ -1,83 +1,103 @@
 const NodeConnection = require("./gateway.js")
 const { ensureQueueObjectType } = require("./models.js")
 const EventEmitter = require("./util/emitter.js")
-const VoiceClient = require("./voice_client.js")
+const VoiceClient = require("./voiceClient.js")
+const { Collection } = require("discord.js")
 
+/**
+ * @typedef NodeOptions
+ * @property {import("./DJSClient")} client
+ * @property {string} host
+ * @property {number} port 
+ * @property {string} userID
+ * @property {number} [shardID]
+ * @property {string} [password="hellodiscodo"]
+ * @property {string} [region]
+ */
 class Node extends EventEmitter {
-    constructor(client, host, port, userId, shardId = null, password = "hellodiscodo", region = null) {
+    /**
+     * @param {NodeOptions} options 
+     */
+    constructor(options) {
         super()
 
-        this.client = client
+        this.client = options.client
 
+        /**
+         * @type {import("./gateway")|null}
+         */
         this.ws = null
-        this.on("*", (...args) => this.onAnyEvent(...args))
+        this.on("*", this.onAnyEvent.bind(this))
 
-        this.host = host
-        this.port = port
-        this.password = password
+        this.host = options.host
+        this.port = options.port
+        this.password = options.password || "hellodiscodo"
 
-        this.userId = userId
-        this.shardId = shardId
-        this.region = region
+        this.userID = options.userID
+        this.shardID = options.shardID
+        this.region = options.region
 
-        this.voiceClients = new Map()
+        /**
+         * @type {Collection<string, import("./voiceClient")>}
+         */
+        this.voiceClients = new Collection()
     }
 
+    /**
+     * @type {string}
+     */
     get URL() {
         return `http://${this.host}:${this.port}`
     }
 
+    /**
+     * @type {string}
+     */
     get WS_URL() {
         return `ws://${this.host}:${this.port}/ws`
     }
 
+    /**
+     * @type {boolean}
+     */
     get isConnected() {
         return this.ws && this.ws.state === "CONNECTED"
     }
 
     async connect() {
-        if (this.isConnected) {
-            throw new Error("Node already connected")
-        }
-
-        if (this.ws && this.ws.state === "CONNECTED") {
-            await this.ws.close(1000)
-        }
+        if (this.isConnected) throw new Error("Node already connected")
+        if (this.ws && this.ws.state === "CONNECTED") await this.ws.close(1000)
 
         this.ws = new NodeConnection(this)
-
-        this.ws.on("*", (...args) => this._message(...args))
+        this.ws.on("*", this._message.bind(this))
 
         await this.ws.connect()
 
-        await new Promise((resolve) => {
+        return await new Promise((resolve) => {
             this.ws.once("CONNECTED", async () => {
-                this.voiceClients.forEach(x => x.__del())
-                this.voiceClients = new Map()
+                this.voiceClients.forEach(x => x.stop())
+                this.voiceClients = new Collection()
 
-                await this.send("IDENTIFY", { user_id: this.userId, shard_id: this.shardId })
+                await this.send("IDENTIFY", { user_id: this.userID, shard_id: this.shardID })
 
-                resolve()
+                resolve(true)
             })
         })
     }
 
     async destroy() {
-        if (this.ws && this.ws.state === "CONNECTED") {
-            await this.ws.close(1000)
-        }
+        if (this.ws && this.ws.state === "CONNECTED") await this.ws.close(1000)
+
         this.ws = null
 
-        this.voiceClients.forEach(x => x.__del())
-        this.voiceClients = new Map()
+        this.voiceClients.forEach(x => x.stop())
+        this.voiceClients = new Collection()
 
-        if (this in this.client.Nodes) {
-            this.client.Nodes.splice(this.client.Nodes.indexOf(this), 1)
-        }
+        if (this.client.nodes.includes(this)) this.client.nodes.splice(this.client.nodes.indexOf(this), 1)
     }
 
     async _message(Operation, Data) {
-        if (!!Data && Data.constructor === Object && Data.guild_id) {
+        if (Data instanceof Object && Data.guild_id) {
             const VC = this.getVC(Data.guild_id, true)
 
             if (VC) {
@@ -91,49 +111,41 @@ class Node extends EventEmitter {
     }
 
     async send(op, data = null) {
-        if (!this.ws || this.ws.state !== "CONNECTED") {
-            throw new Error("Node not connected")
-        }
+        if (!this.ws || this.ws.state !== "CONNECTED") throw new Error("Node not connected")
 
         return await this.ws.sendJson({ op, d: data })
     }
 
     async onResumed(Data) {
-        Object.values(this.voiceClients).forEach(x => x.__del())
+        this.voiceClients.forEach(x => x.stop())
 
-        Object.entries(Data["voice_clients"]).forEach(el => {
-            this.voiceClients[el[0]] = new VoiceClient(this, el[1].id, el[0])
+        Data.voiceClients.entries().forEach(([guildID, { id }]) => {
+            this.voiceClients.set(guildID, new VoiceClient(this, id, guildID))
         })
     }
 
     async onAnyEvent(Operation, Data) {
         switch (Operation) {
-            case "RESUMED":
-                await this.onResumed(Data)
-                break
-            case "VC_CREATED":
-                this.voiceClients[Data.guild_id] = new VoiceClient(this, Data.id, Data.guild_id)
-                break
-            case "VC_DESTROYED":
-                if (Data.guild_id in this.voiceClients) {
-                    this.voiceClients[Data.guild_id].__del()
-                }
-                break
+        case "RESUMED":
+            await this.onResumed(Data)
+            break
+        case "VC_CREATED":
+            this.voiceClients.set(Data.guild_id, new VoiceClient(this, Data.id, Data.guild_id))
+            break
+        case "VC_DESTROYED":
+            if (this.voiceClients.get(Data.guild_id)) this.voiceClients.get(Data.guild_id).stop()
+            break
         }
     }
 
-    getVC(guildId, safe = false) {
-        if (!guildId in this.voiceClients && !safe) {
-            throw new Error("VoiceClient Not Found")
-        }
+    getVC(guildID, safe = false) {
+        if (!this.voiceClients[guildID] && !safe) throw new Error("VoiceClient Not Found")
 
-        return this.voiceClients[guildId]
+        return this.voiceClients.get(guildID)
     }
 
     async discordDispatch(payload) {
-        if (!["READY", "RESUME", "VOICE_STATE_UPDATE", "VOICE_SERVER_UPDATE"].includes(payload.t)) {
-            return
-        }
+        if (!["READY", "RESUME", "VOICE_STATE_UPDATE", "VOICE_SERVER_UPDATE"].includes(payload.t)) return
 
         return await this.send("DISCORD_EVENT", payload)
     }

@@ -2,15 +2,27 @@
   "name": "discodo.js",
   "version": "1.0.0",
   "description": "A Node.js wrapper of Discodo",
-  "main": "index.js",
+  "main": "./src/index.js",
   "repository": "https://github.com/kijk2869/discodo.js.git",
   "author": "Mary <mareowst@gmail.com>",
   "license": "MIT",
+  "contributors": [
+    "zero734kr <zero734kr@gmail.com>"
+  ],
+  "engines": {
+    "node": ">=12"
+  },
+  "bugs": {
+    "url": "https://github.com/kijk2869/discodo.js/issues"
+  },
   "dependencies": {
     "node-fetch": "^2.6.1",
     "ws": "^7.4.3"
   },
-  "devDependencies": {
+  "peerDependencies": {
     "discord.js": "^12.5.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.23.0"
   }
 }
