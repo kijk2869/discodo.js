@@ -139,7 +139,7 @@ class Node extends EventEmitter {
     }
 
     getVC(guildID, safe = false) {
-        if (!this.voiceClients[guildID] && !safe) throw new Error("VoiceClient Not Found")
+        if (!this.voiceClients.get(guildID) && !safe) throw new Error("VoiceClient Not Found")
 
         return this.voiceClients.get(guildID)
     }
