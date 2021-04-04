@@ -23,7 +23,9 @@ class HTTPClient {
     }
 
     async fetch(method, endpoint, options = {}) {
-        const URL = join(this.node.URL, endpoint)
+        const URL = process.platform !== "win32"
+            ? join(this.node.URL, endpoint)
+            : this.node.URL + endpoint
 
         options.method = method
         options.headers = { ...options.headers, ...this.headers }
