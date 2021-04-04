@@ -1,4 +1,5 @@
 const EventEmitter = require("events")
+
 class DiscodoEventEmitter extends EventEmitter {
     constructor() {
         super()
@@ -6,10 +7,6 @@ class DiscodoEventEmitter extends EventEmitter {
 
     emit(event, ...args) {
         super.emit("*", event, ...args)
-
-        Object.defineProperties(this, [{
-
-        }])
 
         return super.emit(event, ...args)
     }
@@ -49,15 +46,12 @@ class DiscodoEventEmitter extends EventEmitter {
 
                 const internalListener = this.listeners(event).find(l => l[symbolId] === true)
 
-                if (internalListener) {
-                    this.removeListener(event, internalListener)
-                }
+                if (internalListener) this.removeListener(event, internalListener)
 
                 reject("The voice connection is timed out.")
             }, timeout)
 
             const listener = (...args) => {
-
                 if (condition && condition(...args)) {
                     clearTimeout(id)
 
@@ -65,9 +59,7 @@ class DiscodoEventEmitter extends EventEmitter {
 
                     const internalListener = this.listeners(event).find(e => e[symbolId] === true)
 
-                    if (internalListener) {
-                        this.removeListener(event, internalListener)
-                    }
+                    if (internalListener) this.removeListener(event, internalListener)
 
                     return resolved
                 }
