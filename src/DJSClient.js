@@ -95,7 +95,7 @@ class DJSClient extends EventEmitter {
     getVC(guildId, safe = false) {
         if (!this.voiceClients.get(guildId) && !safe) throw new Error("VoiceClient Not Found.")
 
-        return this.voiceClients[guildId]
+        return this.voiceClients.get(guildId)
     }
 
     async voiceState(guild, channelId) {
