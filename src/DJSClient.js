@@ -58,7 +58,7 @@ class DJSClient extends EventEmitter {
     async registerNode(options) {
         if (!options.host || !options.port) throw Error("Local Node Not Implemented")
 
-        const Node = new NodeClient(this, options.host, options.port, this.client.user.id, this.client.shard && this.client.shard.id, options.password, options.region)
+        const Node = new NodeClient({ client: this, host: options.host, port: options.port, userID: this.client.user.id, shardID: this.client.shard && this.client.shard.id, password: options.password, region: options.region })
         await Node.connect()
 
         this.nodes.push(Node)
