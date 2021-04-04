@@ -89,7 +89,7 @@ class DJSClient extends EventEmitter {
     }
 
     get voiceClients() {
-        return new Collection(this.nodes.filter(Node => Node.isConnected).map(Node => Object.entries(Node.voiceClients)).flat())
+        return new Collection(this.nodes.filter(Node => Node.isConnected).map(Node => Array.from(Node.voiceClients)).flat())
     }
 
     getVC(guildId, safe = false) {
