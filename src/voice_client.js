@@ -275,8 +275,37 @@ class VoiceClient extends EventEmitter {
         return await this.query("requestSubtitle", Data)
     }
 
-    async getSubtitle() {
-        throw new Error("not implemented")
+    async getSubtitle(options = {}, callback) {
+        const Data = await this.requestSubtitle(options.lang, options.url)
+
+        const identifyToken = Data.identify
+        if (!identifyToken) throw new Error("Subtitle not found")
+
+        let locked = false
+
+        const subtitleReceive = async (subtitle) => {
+            if (subtitle.identify !== identifyToken || locked) return
+
+            locked = true
+
+            try {
+                await callback(subtitle)
+            } finally {
+                locked = false
+            }
+        }
+
+        const subtitleDone = (data) => {
+            if (data.identify !== identifyToken) return
+
+            this.off("Subtitle", subtitleReceive)
+            this.off("subtitleDone", subtitleDone)
+        }
+
+        this.on("Subtitle", subtitleReceive)
+        this.on("subtitleDone", subtitleDone)
+
+        return Data
     }
 
     async moveTo(node) {
