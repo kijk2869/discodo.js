@@ -320,10 +320,9 @@ class VoiceClient extends EventEmitter {
         const channel = this.client.client.channels.cache.get(this.channelID)
         if (!channel) throw new Error("this voice client is not connected to the channel.")
 
-        const [VC] = await Promise.all([
-            this.client.connect(channel, node), 
-            this.fetchState()
-        ])
+        await this.fetchState()
+        
+        const [VC] = await this.client.connect(channel, node)
 
         await VC.setOptions({
             volume: this.volume,
