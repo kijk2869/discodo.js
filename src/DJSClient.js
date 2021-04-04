@@ -6,7 +6,7 @@ class NodeClient extends OriginNode {
     async onResumed(Data) {
         await super.onResumed(Data)
 
-        Data.voiceClients.entries().forEach(([ guildID, vcData ]) => {
+        Data.voiceClients.each.forEach((vcData, guildID) => {
             const guild = this.client.client.guilds.cache.get(guildID)
 
             if (vcData.channel) {
