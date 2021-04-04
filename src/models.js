@@ -256,7 +256,6 @@ class AudioSource {
 }
 
 const ARGUMENT_MAPPING = { "AudioData": AudioData, "AudioSource": AudioSource }
-exports.ARGUMENT_MAPPING = ARGUMENT_MAPPING
 
 function ensureQueueObjectType(VoiceClient, argument) {
     if (argument instanceof Array) return argument.map(x => ensureQueueObjectType(VoiceClient, x))
