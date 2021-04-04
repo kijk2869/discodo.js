@@ -118,7 +118,7 @@ class VoiceClient extends EventEmitter {
         return await this.Node.send(op, data)
     }
 
-    async query(op, data = null, event = null, timeout = 10.0) {
+    async query(op, data = null, event = null, timeout = 10000.0) {
         if (!event) {
             event = op
         }
@@ -127,7 +127,7 @@ class VoiceClient extends EventEmitter {
             data = {}
         }
 
-        const Task = this.waitFor(event, data => { data["guild_id"] === this.guildId }, timeout)
+        const Task = this.waitFor(event, data => { return data["guild_id"] === this.guildId }, timeout)
 
         this.send(op, data)
 

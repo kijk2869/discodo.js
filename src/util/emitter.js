@@ -24,20 +24,19 @@ class ModifiedEventEmitter extends EventEmitter {
             }, timeout)
 
             const listener = (...args) => {
+                if (condition && !condition(...args)) return
 
-                if (condition && condition(...args)) {
-                    clearTimeout(id)
+                clearTimeout(id)
 
-                    const resolved = resolve(...args)
+                const resolved = resolve(...args)
 
-                    const internalListener = this.listeners(event).find(e => e[symbolId] === true)
+                const internalListener = this.listeners(event).find(e => e[symbolId] === true)
 
-                    if (internalListener) {
-                        this.removeListener(event, internalListener)
-                    }
-
-                    return resolved
+                if (internalListener) {
+                    this.removeListener(event, internalListener)
                 }
+
+                return resolved
             }
 
             listener[symbolId] = true
