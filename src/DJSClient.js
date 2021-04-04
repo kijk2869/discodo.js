@@ -117,7 +117,7 @@ class DJSClient extends EventEmitter {
 
         if (VC && VC.node !== node) await VC.destroy()
 
-        const Task = !VC || VC.node !== node ? this.waitFor("VC_CREATED", ([, { guild_id }]) => guild_id === channel.guild.id) : null
+        const Task = !VC || VC.node !== node ? this.waitFor("VC_CREATED", ([_, { guild_id }]) => guild_id === channel.guild.id) : null
 
         await this.voiceState(channel.guild, channel.id)
 
