@@ -156,7 +156,7 @@ class VoiceClient extends EventEmitter {
 
         const Data = await Task
 
-        if (Data.traceback) throw new Error(Data.traceback.entries())
+        if (Data.traceback) throw new Error(Object.entries(Data.traceback))
 
         return Data
     }
