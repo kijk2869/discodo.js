@@ -71,7 +71,7 @@ class DJSClient extends EventEmitter {
         const timeout = setTimeout(() => {
             clearTimeout(timeout)
             
-            throw new Error("Node connection timed out."
+            throw new Error("Node connection timed out.")
         }, 15000)
         await Node.connect()
 
