@@ -119,7 +119,7 @@ class Node extends EventEmitter {
     async onResumed(Data) {
         this.voiceClients.forEach(x => x.stop())
 
-        Data.voiceClients.entries().forEach(([guildID, { id }]) => {
+        Data.voiceClients.each(({ id }, guildID) => {
             this.voiceClients.set(guildID, new VoiceClient(this, id, guildID))
         })
     }
