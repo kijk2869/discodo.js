@@ -154,7 +154,7 @@ class DJSClient extends EventEmitter {
     }
 
     async destroy(guild) {
-        VC = this.getVC(guild.id)
+        const VC = this.getVC(guild.id)
 
         await this.disconnect(guild)
         await VC.destroy()
