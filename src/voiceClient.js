@@ -141,7 +141,7 @@ class VoiceClient extends EventEmitter {
     }
 
     async send(op, data) {
-        if (data["guild_id"] !== this.guildID) data["guild_id"] = this.guildID
+        if (data.guild_id !== this.guildID) data.guild_id = this.guildID
 
         return await this.node.send(op, data)
     }
