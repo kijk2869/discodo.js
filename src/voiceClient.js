@@ -14,6 +14,7 @@ const { Queue } = require("./models.js")
  * @property {string} guild_id
  * @property {string} [channel_id=null]
  * @property {DiscodoAudioOptions} options
+ * @property {Record<string, string>} [traceback]
  */
 
 class VoiceClient extends EventEmitter {
@@ -60,8 +61,8 @@ class VoiceClient extends EventEmitter {
 
         this.on("getState", this.handleGetState.bind(this))
         this.on("VC_CHANNEL_EDITED", this._VC_CHANNEL_EDITED.bind(this))
-        this.on("getQueue", this.queue.handleGetQueue.bind(this))
-        this.on("QUEUE_EVENT", this.queue.handleQueueEvent.bind(this))
+        this.on("getQueue", this.queue.handleGetQueue.bind(this.queue))
+        this.on("QUEUE_EVENT", this.queue.handleQueueEvent.bind(this.queue))
 
         this.send("getQueue", {})
     }
@@ -126,7 +127,8 @@ class VoiceClient extends EventEmitter {
      * @param {AudioPacket} data 
      */
     handleGetState(data) {
-        const { volume, crossfade, autoplay, filter } = data.options
+        if (data.traceback) throw new Error(Object.entries(data.traceback).map(err => err.join(": ")).join("\n"))
+        const { volume, crossfade, autoplay, filter } = data.options || {}
 
         this._volume = volume
         this._crossfade = crossfade
@@ -150,7 +152,7 @@ class VoiceClient extends EventEmitter {
         if (!event) event = op
         if (!data) data = {}
 
-        const Task = this.waitFor(event, ({ guild_id }) => { guild_id === this.guildId }, timeout)
+        const Task = this.waitFor(event, ({ guild_id }) => { guild_id === this.guildID }, timeout)
 
         this.send(op, data)
 
@@ -192,7 +194,7 @@ class VoiceClient extends EventEmitter {
     }
 
     async putSource(source) {
-        const { source: output } = await this.http.putSource(Array.isArray(source) ? source.map(x => x.data) : source)
+        const { source: output } = await this.http.putSource(Array.isArray(source) ? source.map(x => x._data) : source._data)
 
         return output
     }
@@ -333,7 +335,7 @@ class VoiceClient extends EventEmitter {
 
         if (this.context) await VC.setContext(this.context)
         if (this.current) await VC.putSource(this.current)
-        if (this.Queue) await VC.putSource(this.Queue)
+        if (this.queue) await VC.putSource(this.queue)
 
         return VC
     }

@@ -20,7 +20,7 @@
     "ws": "^7.4.3"
   },
   "peerDependencies": {
-    "discord.js": "^12.5.1"
+    "discord.js": "^12.5.3"
   },
   "devDependencies": {
     "eslint": "^7.23.0"

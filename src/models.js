@@ -8,69 +8,69 @@ class AudioData {
      */
     constructor(VoiceClient, data) {
         this.voiceClient = VoiceClient
-        this.data = data
+        this._data = data
 
-        this.context = this.data.context
+        this.context = this._data.context
 
         Object.defineProperties(this, {
             _type: {
-                value: this.data ? this.data._type : null,
+                value: this._data ? this._data._type : null,
                 writable: false
             },
             tag: {
-                value: this.data.tag,
+                value: this._data.tag,
                 writable: false
             },
             id: {
-                value: this.data.id,
+                value: this._data.id,
                 writable: false
             },
             title: {
-                value: this.data.title,
+                value: this._data.title,
                 writable: false
             },
             webpage_url: {
-                value: this.data.webpage_url,
+                value: this._data.webpage_url,
                 writable: false
             },
             thumbnail: {
-                value: this.data.thumbnail,
+                value: this._data.thumbnail,
                 writable: false
             },
             url: {
-                value: this.data.url,
+                value: this._data.url,
                 writable: false
             },
             duration: {
-                value: this.data.duration,
+                value: this._data.duration,
                 writable: false
             },
             isLive: {
-                value: this.data.is_live,
+                value: this._data.is_live,
                 writable: false
             },
             uploader: {
-                value: this.data.uploader,
+                value: this._data.uploader,
                 writable: false
             },
             description: {
-                value: this.data.description,
+                value: this._data.description,
                 writable: false
             },
             subtitles: {
-                value: this.data.subtitles,
+                value: this._data.subtitles,
                 writable: false
             },
             chapters: {
-                value: this.data.chapters,
+                value: this._data.chapters,
                 writable: false
             },
             related: {
-                value: this.data.related,
+                value: this._data.related,
                 writable: false
             },
             startPosition: {
-                value: this.data.start_position,
+                value: this._data.start_position,
                 writable: false
             }
         })
@@ -149,71 +149,71 @@ class AudioSource {
         this._data = data
         this.voiceClient = VoiceClient
 
-        this.context = this.data.context
+        this.context = data.context
 
         Object.defineProperties(this, {
             _type: {
-                value: this.data ? this.data._type : null,
+                value: this._data ? this._data._type : null,
                 writable: false
             },
             tag: {
-                value: this.data.tag,
+                value: this._data.tag,
                 writable: false
             },
             id: {
-                value: this.data.id,
+                value: this._data.id,
                 writable: false
             },
             title: {
-                value: this.data.title,
+                value: this._data.title,
                 writable: false
             },
             webpage_url: {
-                value: this.data.webpage_url,
+                value: this._data.webpage_url,
                 writable: false
             },
             url: {
-                value: this.data.url,
+                value: this._data.url,
                 writable: false
             },
             duration: {
-                value: this.data.duration,
+                value: this._data.duration,
                 writable: false
             },
             isLive: {
-                value: this.data.is_live,
+                value: this._data.is_live,
                 writable: false
             },
             uploader: {
-                value: this.data.uploader,
+                value: this._data.uploader,
                 writable: false
             },
             description: {
-                value: this.data.description,
+                value: this._data.description,
                 writable: false
             },
             subtitles: {
-                value: this.data.subtitles,
+                value: this._data.subtitles,
                 writable: false
             },
             asOf: {
-                value: this.data.as_of,
+                value: this._data.as_of,
                 writable: false
             },
             chapters: {
-                value: this.data.chapters,
+                value: this._data.chapters,
                 writable: false
             },
             related: {
-                value: this.data.related,
+                value: this._data.related,
                 writable: false
             },
             start_position: {
-                value: this.data.start_position,
+                value: this._data.start_position,
                 writable: false
             }, 
             seekable: {
-                value: this.data.seekable,
+                value: this._data.seekable,
                 writable: false
             }
         })
@@ -322,7 +322,7 @@ class Queue extends Array {
     handleGetQueue({ entries }) {
         if (!entries) return
 
-        const newEntries = entries.map(this.__checkArgumentType)
+        const newEntries = entries.map(this.__checkArgumentType.bind(this))
 
         if (!newEntries) return
 
@@ -331,7 +331,7 @@ class Queue extends Array {
     }
 
     handleQueueEvent({ name, args }) {
-        const [, newArgs] = [name, args.map(this.__checkArgumentType)]
+        const [, newArgs] = [name, args.map(this.__checkArgumentType.bind(this))]
 
         if (!Reflect.ownKeys(this).includes(name)) return
 

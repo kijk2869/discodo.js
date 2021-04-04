@@ -37,7 +37,7 @@ class DiscodoEventEmitter extends EventEmitter {
      * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
      * SOFTWARE.
      */
-    waitFor(event, condition, timeout = 10000) {
+    waitFor(event, condition, timeout = 10000, errmsg = "The voice connection is timed out.") {
         const symbolId = Symbol("discodoInternal")
 
         return new Promise((resolve, reject) => {
@@ -48,7 +48,7 @@ class DiscodoEventEmitter extends EventEmitter {
 
                 if (internalListener) this.removeListener(event, internalListener)
 
-                reject("The voice connection is timed out.")
+                reject(errmsg)
             }, timeout)
 
             const listener = (...args) => {

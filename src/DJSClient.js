@@ -6,15 +6,24 @@ class NodeClient extends OriginNode {
     async onResumed(Data) {
         await super.onResumed(Data)
 
-        Data.voiceClients.each((vcData, guildID) => {
-            const guild = this.client.client.guilds.cache.get(guildID)
+        Object.entries(Data.voice_clients).map(async ([guildID], { channel: voiceChannel }) => {
+            const guild = this.client.client.guilds.cache.get(`${guildID}`)
 
-            if (vcData.channel) {
-                const channel = guild.channels.cache.get(vcData.channel)
-                this.client.connect(channel, this)
-            } else {
-                this.client.disconnect(guild)
+            if (voiceChannel) {
+                const channel = guild.channels.cache.get(`${voiceChannel}`)
+                return this.client.connect(channel, this)
             }
+
+            if (guild) return this.client.disconnect(guild)
+
+            let fetchedGuild
+            try {
+                fetchedGuild = await this.client.client.guilds.fetch(`${guildID}`)
+            } catch (e) {
+                throw new Error("Unable to close a invalidated voice session.")
+            }
+
+            this.client.disconnect(fetchedGuild)
         })
     }
 }
@@ -46,7 +55,7 @@ class DJSClient extends EventEmitter {
 
         SelectNodes.forEach(Node => {
             if (!Node || !Node.isConnected) return
-            
+
             Node.discordDispatch(payload)
         })
     }
@@ -58,27 +67,31 @@ class DJSClient extends EventEmitter {
     async registerNode(options) {
         if (!options.host || !options.port) throw Error("Local Node Not Implemented")
 
-        const Node = new NodeClient({ 
-            client: this, 
-            host: options.host, 
-            port: options.port, 
-            userID: this.client.user.id, 
-            shardID: this.client.shard && this.client.shard.id, 
-            password: options.password, 
+        const Node = new NodeClient({
+            client: this,
+            host: options.host,
+            port: options.port,
+            userID: this.client.user.id,
+            shardID: this.client.shard && this.client.shard.id,
+            password: options.password,
             region: options.region
         })
-        
+
         const timeout = setTimeout(() => {
             clearTimeout(timeout)
-            
+
             throw new Error("Node connection timed out.")
         }, 15000)
         await Node.connect()
+
+        clearTimeout(timeout)
 
         this.nodes.push(Node)
 
         Node.on("VC_DESTROYED", this._onVCDestroyed.bind(this))
         Node.on("*", this._onAnyNodeEvent.bind(this))
+
+        return Node
     }
 
     _onVCDestroyed({ guild_id }) {
@@ -113,11 +126,20 @@ class DJSClient extends EventEmitter {
     }
 
     async voiceState(guild, channelId) {
+        if (!guild) throw new Error("Target guild not specified.")
+
         return await guild.shard.send({ "op": 4, "d": { "guild_id": guild.id, "channel_id": channelId } })
     }
 
+    /**
+     * 
+     * @param {import("discord.js").VoiceChannel} channel 
+     * @param {import("./node")} node 
+     * @returns 
+     */
     async connect(channel, node = null) {
-        if (!channel.guild) throw new Error()
+        if (channel.type !== "voice" && channel.type !== "")
+            if (!channel.guild) throw new Error()
 
         if (!node) {
             if (!this.getBestNode()) throw new Error("There is not any node connected.")
@@ -131,7 +153,8 @@ class DJSClient extends EventEmitter {
 
         if (VC && VC.node !== node) await VC.destroy()
 
-        const Task = !VC || VC.node !== node ? this.waitFor("VC_CREATED", ([_, { guild_id }]) => guild_id === channel.guild.id) : null
+        // eslint-disable-next-line no-unused-vars
+        const Task = !VC || VC.node !== node ? this.waitFor("VC_CREATED", ([_, { guild_id }]) => `${guild_id}` === channel.guild.id) : null
 
         await this.voiceState(channel.guild, channel.id)
 
@@ -140,6 +163,14 @@ class DJSClient extends EventEmitter {
 
         if (Task) {
             const [VC] = await Task
+                .catch(e => {
+
+                    if (`${e}` !== "The voice connection is timed out.") return
+
+                    channel.leave()
+
+                    throw e
+                })
 
             return VC
         }

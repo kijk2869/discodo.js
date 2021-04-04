@@ -58,7 +58,6 @@ class NodeConnection extends EventEmitter {
         console.log(code)
         console.log(reason)
         this.ws.removeAllListeners()
-        this.ws = null
 
         this.state = "DISCONNECTED"
     }
@@ -92,7 +91,9 @@ class NodeConnection extends EventEmitter {
     async close(...args) {
         if (this.keepAliver) clearInterval(this.keepAliver)
 
-        return await this.ws.close(...args)
+        await this.ws.close(...args)
+
+        this.ws = null
     }
 }
 

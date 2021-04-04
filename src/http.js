@@ -1,6 +1,5 @@
 const fetch = require("node-fetch")
 const { ensureQueueObjectType } = require("./models.js")
-const { join } = require("path")
 
 class HTTPClient {
     /**
@@ -23,23 +22,23 @@ class HTTPClient {
     }
 
     async fetch(method, endpoint, options = {}) {
-        const URL = process.platform !== "win32"
-            ? join(this.node.URL, endpoint)
-            : this.node.URL + endpoint
+        const URL = this.node.URL + endpoint
 
         options.method = method
         options.headers = { ...options.headers, ...this.headers }
+
 
         const response = await fetch(URL, options)
 
         const body = await response.text()
 
+
         let parsed = null
         try {
             parsed = JSON.parse(body)
         } catch (e) {
-            if (e instanceof SyntaxError) throw e
-            parsed = body
+            if (e instanceof SyntaxError) parsed = body
+            else throw e
         }
 
         const data = ensureQueueObjectType(this.voiceClient, parsed)
