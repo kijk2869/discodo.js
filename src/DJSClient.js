@@ -34,6 +34,9 @@ class DJSClient extends EventEmitter {
 
         if (!version.startsWith("12")) throw new Error("Discodo.js is only working on discord.js v12.")
 
+        /**
+         * @type {import("discord.js").Client}
+         */
         this.client = client
 
         this.nodes = new Array()
@@ -133,11 +136,13 @@ class DJSClient extends EventEmitter {
 
     /**
      * 
-     * @param {import("discord.js").VoiceChannel} channel 
+     * @param {import("discord.js").VoiceChannel | string} channel ChannelResolvable
      * @param {import("./node")} node 
      * @returns 
      */
     async connect(channel, node = null) {
+        channel = this.client.channels.resolve(channel)
+
         if (channel.type !== "voice" && channel.type !== "")
             if (!channel.guild) throw new Error()
 
@@ -154,7 +159,7 @@ class DJSClient extends EventEmitter {
         if (VC && VC.node !== node) await VC.destroy()
 
         // eslint-disable-next-line no-unused-vars
-        const Task = !VC || VC.node !== node ? this.waitFor("VC_CREATED", ([_, { guild_id }]) => `${guild_id}` === channel.guild.id) : null
+        const Task = !VC || VC.node !== node ? this.waitFor("VC_CREATED", (($, { guild_id }) => `${guild_id}` === channel.guild.id)) : Promise.resolve(VC)
 
         await this.voiceState(channel.guild, channel.id)
 
@@ -162,9 +167,8 @@ class DJSClient extends EventEmitter {
             this.GuildReservationMap.delete(channel.guild.id)
 
         if (Task) {
-            const [VC] = await Task
+            const VC = await Task
                 .catch(e => {
-
                     if (`${e}` !== "The voice connection is timed out.") return
 
                     channel.leave()

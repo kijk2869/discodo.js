@@ -1,5 +1,6 @@
 const fetch = require("node-fetch")
 const { ensureQueueObjectType } = require("./models.js")
+const { Agent } = require("http")
 
 class HTTPClient {
     /**
@@ -26,6 +27,8 @@ class HTTPClient {
 
         options.method = method
         options.headers = { ...options.headers, ...this.headers }
+
+        if (Agent) options.agent = new Agent({ keepAlive: true })
 
 
         const response = await fetch(URL, options)

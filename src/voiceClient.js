@@ -152,7 +152,9 @@ class VoiceClient extends EventEmitter {
         if (!event) event = op
         if (!data) data = {}
 
-        const Task = this.waitFor(event, ({ guild_id }) => { guild_id === this.guildID }, timeout)
+        const Task = this.waitFor(event, ({ guild_id }) => `${guild_id}` === this.guildID, timeout)
+
+        if (this.channelID && this.client.client.channels.cache.get(this.channelID)) this.client.client.channels.cache.get(this.channelID).leave()
 
         this.send(op, data)
 
