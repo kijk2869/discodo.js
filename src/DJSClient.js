@@ -6,7 +6,7 @@ class NodeClient extends OriginNode {
     async onResumed(Data) {
         await super.onResumed(Data)
 
-        Object.entries(Data.voice_clients).map(async ([guildID], { channel: voiceChannel }) => {
+        Object.entries(Data.voice_clients).map(async ([guildID, { channel: voiceChannel }]) => {
             const guild = this.client.client.guilds.cache.get(`${guildID}`)
 
             if (voiceChannel) {
