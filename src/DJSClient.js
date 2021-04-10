@@ -53,7 +53,7 @@ class DJSClient extends EventEmitter {
 
         if (["VOICE_STATE_UPDATE", "VOICE_SERVER_UPDATE"].includes(payload.t)) {
             const VC = this.getVC(payload.d.guild_id, true)
-            SelectNodes.push(this.GuildReservationMap.get(payload.d.guild_id) || (VC ? VC.Node : this.getBestNode()))
+            SelectNodes.push(this.GuildReservationMap.get(payload.d.guild_id) || (VC && VC.Node ? VC.Node : this.getBestNode()))
         } else SelectNodes = this.nodes
 
         SelectNodes.forEach(Node => {
