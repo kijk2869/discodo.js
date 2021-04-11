@@ -85,6 +85,7 @@ class DJSClient extends EventEmitter {
 
             throw new Error("Node connection timed out.")
         }, 15000)
+        
         await Node.connect()
 
         clearTimeout(timeout)

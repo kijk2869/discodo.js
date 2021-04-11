@@ -97,7 +97,7 @@ class Node extends EventEmitter {
     }
 
     async _message(Operation, Data) {
-        if (Data instanceof Object && Data.guild_id) {
+        if (typeof Data === "object" && Data.guild_id) {
             const VC = this.getVC(Data.guild_id, true)
 
             if (VC) {

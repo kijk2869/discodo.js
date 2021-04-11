@@ -65,6 +65,8 @@ class VoiceClient extends EventEmitter {
         this.on("QUEUE_EVENT", this.queue.handleQueueEvent.bind(this.queue))
 
         this.send("getQueue", {})
+
+        process.once("exit", this.stop.bind(this))
     }
 
     stop() {
@@ -240,12 +242,14 @@ class VoiceClient extends EventEmitter {
      * @returns 
      */
     async setOptions(options) {
+        const response = await this.http.setOptions(options)
+
         if ("volume" in options) this._volume = options.volume
         if ("crossfade" in options) this._crossfade = options.crossfade
         if ("autoplay" in options) this._autoplay = options.autoplay
         if ("filter" in options) this._filter = options.filter
 
-        return await this.http.setOptions(options)
+        return response
     }
 
     async setVolume(volume) {

@@ -1,6 +1,7 @@
 const fetch = require("node-fetch")
 const { ensureQueueObjectType } = require("./models.js")
 const { Agent } = require("http")
+const { inspect } = require("util")
 
 class HTTPClient {
     /**
@@ -48,7 +49,7 @@ class HTTPClient {
 
         if (response.status >= 200 && response.status < 300) return data
 
-        throw new Error(`HTTPException: ${response.status} -> ${data}`)
+        throw new Error(`HTTPException: ${response.status} -> ${inspect(data, { depth: 2 })}`)
     }
 
     async getSource(query) {
