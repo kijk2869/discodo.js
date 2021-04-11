@@ -150,7 +150,7 @@ class VoiceClient extends EventEmitter {
         return await this.node.send(op, data)
     }
 
-    async query(op, data, event, timeout = 10.0) {
+    async query(op, data, event, timeout = 10000) {
         if (!event) event = op
         if (!data) data = {}
 
