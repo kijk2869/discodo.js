@@ -333,7 +333,10 @@ class Queue extends Array {
     handleQueueEvent({ name, args }) {
         const [, newArgs] = [name, args.map(this.__checkArgumentType.bind(this))]
 
-        if (!Reflect.ownKeys(this).includes(name)) return
+        if (!this[name]) {
+            console.log(`warning: QUEUE_EVENT method ${name} not found, ignored.`)
+            return
+        }
 
         return this[name](...newArgs)
     }
