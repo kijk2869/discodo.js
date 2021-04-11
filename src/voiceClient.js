@@ -52,7 +52,7 @@ class VoiceClient extends EventEmitter {
 
         this._current = null
 
-        this.syncTask = setInterval(() => { this.syncWithNode }, 300 * 1000)
+        this.syncTask = setInterval(this.syncWithNode.bind(this), 5000)
 
         /**
          * @type {Queue}
