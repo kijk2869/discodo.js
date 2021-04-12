@@ -265,7 +265,7 @@ function ensureQueueObjectType(VoiceClient, argument) {
      */
     const TypeObject = ARGUMENT_MAPPING[argument instanceof Object ? argument._type : null]
 
-    if (!argument) return
+    if (!argument) return argument
 
     if (!argument._type || !TypeObject) {
         if (argument instanceof Object) return Object.fromEntries(Object.entries(argument).map(([ele1, ele2]) => [ele1, ensureQueueObjectType(VoiceClient, ele2)]))
