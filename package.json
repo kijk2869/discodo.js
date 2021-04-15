@@ -1,6 +1,6 @@
 {
   "name": "discodo.js",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A Node.js wrapper of Discodo",
   "main": "index.js",
   "repository": "https://github.com/kijk2869/discodo.js.git",
