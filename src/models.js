@@ -1,246 +1,251 @@
+"use strict"
+
 class AudioData {
+    /**
+     * 
+     * @param {import("./voiceClient")} VoiceClient 
+     * @param {*} data 
+     */
     constructor(VoiceClient, data) {
-        this.VoiceClient = VoiceClient
-        this.data = data
+        this.voiceClient = VoiceClient
+        this._data = data
+
+        this.context = this._data.context
+
+        Object.defineProperties(this, {
+            _type: {
+                value: this._data ? this._data._type : null,
+                writable: false
+            },
+            tag: {
+                value: this._data.tag,
+                writable: false
+            },
+            id: {
+                value: this._data.id,
+                writable: false
+            },
+            title: {
+                value: this._data.title,
+                writable: false
+            },
+            webpage_url: {
+                value: this._data.webpage_url,
+                writable: false
+            },
+            thumbnail: {
+                value: this._data.thumbnail,
+                writable: false
+            },
+            url: {
+                value: this._data.url,
+                writable: false
+            },
+            duration: {
+                value: this._data.duration,
+                writable: false
+            },
+            isLive: {
+                value: this._data.is_live,
+                writable: false
+            },
+            uploader: {
+                value: this._data.uploader,
+                writable: false
+            },
+            description: {
+                value: this._data.description,
+                writable: false
+            },
+            subtitles: {
+                value: this._data.subtitles,
+                writable: false
+            },
+            chapters: {
+                value: this._data.chapters,
+                writable: false
+            },
+            related: {
+                value: this._data.related,
+                writable: false
+            },
+            startPosition: {
+                value: this._data.start_position,
+                writable: false
+            }
+        })
     }
 
     get isInQueue() {
-        return Boolean(this.VoiceClient.Queue.find(el => el.tag === this.tag))
-    }
-
-    get _type() {
-        return this.data ? this.data._type : null
-    }
-
-    get tag() {
-        return this.data.tag
-    }
-
-    get id() {
-        return this.data.id
-    }
-
-    get title() {
-        return this.data.title
-    }
-
-    get webpage_url() {
-        return this.data.webpage_url
-    }
-
-    get thumbnail() {
-        return this.data.thumbnail
-    }
-
-    get url() {
-        return this.data.url
-    }
-
-    get duration() {
-        return this.data.duration
-    }
-
-    get is_live() {
-        return this.data.is_live
-    }
-
-    get uploader() {
-        return this.data.uploader
-    }
-
-    get description() {
-        return this.data.description
-    }
-
-    get subtitles() {
-        return this.data.subtitles
-    }
-
-    get chapters() {
-        return this.data.chapters
-    }
-
-    get related() {
-        return this.data.related
-    }
-
-    get context() {
-        return this.data.context
-    }
-
-    get start_position() {
-        return this.data.start_position
+        return !!this.voiceClient.queue.find(el => el.tag === this.tag)
     }
 
     async put() {
-        if (this.isInQueue) {
-            throw new Error("the source is already in the queue.")
-        }
+        if (this.isInQueue) throw new Error("this source is already in the queue.")
 
-        return await this.VoiceClient.putSource(this)
+        return await this.voiceClient.putSource(this)
     }
 
     async getContext() {
-        if (!this.isInQueue) {
-            throw new Error("the source is not in the queue.")
-        }
+        if (!this.isInQueue) throw new Error("the source is not in the queue.")
 
-        data = await this.VoiceClient.http.getQueueSource(this.tag)
-        this.context = "context" in data ? data.context : {}
-
-        return this.context
+        const data = await this.voiceClient.http.getQueueSource(this.tag)
+        return this.context = "context" in data ? data.context : {}
     }
 
     async setContext(data) {
-        if (!this.isInQueue) {
-            throw new Error("the source is not in the queue.")
-        }
+        if (!this.isInQueue) throw new Error("the source is not in the queue.")
 
-        data = await this.VoiceClient.http.setQueueSource(this.tag, { context: data })
-        this.context = "context" in data ? data.context : {}
-
-        return this.context
+        data = await this.voiceClient.http.setQueueSource(this.tag, { context: data })
+        return this.context = "context" in data ? data.context : {}
     }
 
+    /**
+     * 
+     * @param {number} index 
+     * @returns {Promise<this>}
+     */
     async moveTo(index) {
-        if (!this.isInQueue) {
-            throw new Error("the source is not in the queue.")
-        }
+        if (!this.isInQueue) throw new Error("the source is not in the queue.")
 
-        data = await this.VoiceClient.http.setQueueSource(this.tag, { index })
+        await this.voiceClient.http.setQueueSource(this.tag, { index })
 
         return this
     }
 
+    /**
+     *
+     * @param {number} offset
+     * @returns {Promise<this>}
+     */
     async seek(offset) {
-        if (!this.isInQueue) {
-            throw new Error("the source is not in the queue.")
-        }
+        if (!this.isInQueue) throw new Error("the source is not in the queue.")
 
-        data = await this.VoiceClient.http.setQueueSource(this.tag, { start_position: offset })
+        await this.voiceClient.http.setQueueSource(this.tag, { start_position: offset })
 
         return this
     }
 
+    /**
+     * 
+     * @returns {Promise<this>}
+     */
     async remove() {
-        if (!this.isInQueue) {
-            throw new Error("the source is not in the queue.")
-        }
+        if (!this.isInQueue) throw new Error("the source is not in the queue.")
 
-        data = await this.VoiceClient.http.removeQueueSource(this.tag)
+        await this.voiceClient.http.removeQueueSource(this.tag)
 
         return this
     }
 }
 
 class AudioSource {
+    /**
+     * 
+     * @param {import("./voiceClient")} VoiceClient 
+     * @param {*} data 
+     */
     constructor(VoiceClient, data) {
         this._data = data
-        this.VoiceClient = VoiceClient
+        this.voiceClient = VoiceClient
+
+        this.context = data.context
+
+        Object.defineProperties(this, {
+            _type: {
+                value: this._data ? this._data._type : null,
+                writable: false
+            },
+            tag: {
+                value: this._data.tag,
+                writable: false
+            },
+            id: {
+                value: this._data.id,
+                writable: false
+            },
+            title: {
+                value: this._data.title,
+                writable: false
+            },
+            webpage_url: {
+                value: this._data.webpage_url,
+                writable: false
+            },
+            url: {
+                value: this._data.url,
+                writable: false
+            },
+            duration: {
+                value: this._data.duration,
+                writable: false
+            },
+            isLive: {
+                value: this._data.is_live,
+                writable: false
+            },
+            uploader: {
+                value: this._data.uploader,
+                writable: false
+            },
+            description: {
+                value: this._data.description,
+                writable: false
+            },
+            subtitles: {
+                value: this._data.subtitles,
+                writable: false
+            },
+            asOf: {
+                value: this._data.as_of,
+                writable: false
+            },
+            chapters: {
+                value: this._data.chapters,
+                writable: false
+            },
+            related: {
+                value: this._data.related,
+                writable: false
+            },
+            start_position: {
+                value: this._data.start_position,
+                writable: false
+            }, 
+            seekable: {
+                value: this._data.seekable,
+                writable: false
+            }
+        })
     }
 
     get isInQueue() {
-        return Boolean(this.VoiceClient.Queue.find(el => el.tag === this.tag))
+        return !!this.voiceClient.queue.find(el => el.tag === this.tag)
     }
 
-    get _type() {
-        return this.data ? this.data._type : null
-    }
-
-    get tag() {
-        return this.data.tag
-    }
-
-    get id() {
-        return this.data.id
-    }
-
-    get title() {
-        return this.data.title
-    }
-
-    get webpage_url() {
-        return this.data.webpage_url
-    }
-
-    get url() {
-        return this.data.url
-    }
-
-    get duration() {
-        return this.data.duration
-    }
-
-    get is_live() {
-        return this.data.is_live
-    }
-
-    get uploader() {
-        return this.data.uploader
-    }
-
-    get description() {
-        return this.data.description
-    }
-
-    get subtitles() {
-        return this.data.subtitles
-    }
-
-    get as_of() {
-        return this.data.as_of
-    }
-
-    get chapters() {
-        return this.data.chapters
-    }
-
-    get related() {
-        return this.data.related
-    }
-
-    get context() {
-        return this.data.context
-    }
-
-    get start_position() {
-        return this.data.start_position
-    }
-
-    get seekable() {
-        return this.data.seekable
-    }
 
     get position() {
-        return Math.round(
-            this.data.position
-            + (Math.round(Date.now() / 1000) - (this.data.as_of ? this.as_of : 0))
-            , 2
-        )
+        return (this._data.position + (Math.round(Date.now() / 1000) - (this.asOf || 0))).toFixed(2)
     }
 
     async getContext() {
-        if (!this.isInQueue) {
-            throw new Error("the source is not in the queue.")
-        }
+        if (!this.isInQueue) throw new Error("the source is not in the queue.")
 
+        let data
         if (this.isInQueue) {
-            data = await this.VoiceClient.http.getQueueSource(this.tag)
+            data = await this.voiceClient.http.getQueueSource(this.tag)
         } else {
-            data = await this.VoiceClient.http.getCurrent()
+            data = await this.voiceClient.http.getCurrent()
         }
 
-        this.context = "context" in data ? data.context : {}
-
-        return this.context
+        return this.context = "context" in data ? data.context : {}
     }
 
     async setContext(data) {
-
         if (this.isInQueue) {
-            data = await this.VoiceClient.http.setQueueSource(this.tag, { context: data })
+            data = await this.voiceClient.http.setQueueSource(this.tag, { context: data })
         } else {
-            data = await this.VoiceClient.http.setCurrent({ context: data })
+            data = await this.voiceClient.http.setCurrent({ context: data })
         }
 
         this.context = "context" in data ? data.context : {}
@@ -250,100 +255,90 @@ class AudioSource {
 
 }
 
-ARGUMENT_MAPPING = { "AudioData": AudioData, "AudioSource": AudioSource }
+const ARGUMENT_MAPPING = { "AudioData": AudioData, "AudioSource": AudioSource }
 
 function ensureQueueObjectType(VoiceClient, argument) {
-    if (!!argument && argument.constructor === Array) {
-        return argument.map(x => ensureQueueObjectType(VoiceClient, x))
-    }
+    if (argument instanceof Array) return argument.map(x => ensureQueueObjectType(VoiceClient, x))
 
-    const typeObject = ARGUMENT_MAPPING[!!argument && argument.constructor === Object ? argument._type : null]
+    /**
+     * @type {AudioData|AudioSource|undefined}
+     */
+    const TypeObject = ARGUMENT_MAPPING[argument instanceof Object ? argument._type : null]
 
-    if (!argument) {
-        return
-    }
+    if (!argument) return argument
 
-    if (!argument._type || !typeObject) {
-        if (!!argument && argument.constructor === Object) {
-            return Object.fromEntries(Object.entries(argument).map(el => [el[0], ensureQueueObjectType(VoiceClient, el[1])]))
-        }
+    if (!argument._type || !TypeObject) {
+        if (argument instanceof Object) return Object.fromEntries(Object.entries(argument).map(([ele1, ele2]) => [ele1, ensureQueueObjectType(VoiceClient, ele2)]))
 
         return argument
     }
 
-    return new typeObject(VoiceClient, argument)
+    return new TypeObject(VoiceClient, argument)
 }
 
 class Queue extends Array {
     constructor(VoiceClient) {
         super()
 
-        super.VoiceClient = VoiceClient
+        this.voiceClient = VoiceClient
     }
 
     __checkArgumentType(argument) {
-        return ensureQueueObjectType(super.VoiceClient, argument)
+        return ensureQueueObjectType(this.voiceClient, argument)
     }
 
     setItem(index, value) {
-        super[index] = value
+        return super[index] = value
     }
 
     delItem(index) {
-        super.splice(index, 1)
+        return super.splice(index, 1)
     }
 
     extend(value) {
-        super.splice(super.length, 0, ...value)
+        return super.splice(super.length, 0, ...value)
     }
 
     append(value) {
-        super.push(value)
+        return super.push(value)
     }
 
     remove(value) {
-        super.splice(super.indexOf(value), 1)
+        return super.splice(super.indexOf(value), 1)
     }
 
     insert(index, value) {
-        super.splice(index, 0, value)
+        return super.splice(index, 0, value)
     }
 
     pop(index) {
-        super.splice(index, 1)
-    }
-
-    reverse() {
-        super.reverse()
+        return super.splice(index, 1)
     }
 
     clear() {
-        super.splice(0, super.length)
+        return super.splice(0, super.length)
     }
 
-    handleGetQueue(data) {
-        if (!data.entries) {
-            return
-        }
+    handleGetQueue({ entries }) {
+        if (!entries) return
 
-        const entries = data.entries.map(this.__checkArgumentType)
+        const newEntries = entries.map(this.__checkArgumentType.bind(this))
 
-        if (!entries) {
-            return
-        }
+        if (!newEntries) return
 
         this.clear()
-        this.extend(entries)
+        this.extend(newEntries)
     }
 
-    handleQueueEvent(data) {
-        var [name, args] = [data.name, data.args.map(this.__checkArgumentType)]
+    handleQueueEvent({ name, args }) {
+        const [, newArgs] = [name, args.map(this.__checkArgumentType.bind(this))]
 
         if (!this[name]) {
+            console.log(`warning: QUEUE_EVENT method ${name} not found, ignored.`)
             return
         }
 
-        return this[name](...args)
+        return this[name](...newArgs)
     }
 }
 
