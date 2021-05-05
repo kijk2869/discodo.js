@@ -1,6 +1,7 @@
 const EventEmitter = require("./util/emitter.js")
 const Websocket = require("ws")
 const { performance } = require("perf_hooks")
+const compare = require('node-version-compare')
 
 class NodeConnection extends EventEmitter {
     /**
@@ -80,7 +81,11 @@ class NodeConnection extends EventEmitter {
         this.emit(Operation, Data)
     }
 
-    HELLO({ heartbeat_interval }) {
+    HELLO({ version, heartbeat_interval }) {
+        if (compare(version, "3.0.0") < 0) {
+            console.warn(`Discodo version mismatch between server and client. (Node ${version}/Client 3.0.0)`)
+        }
+        
         this.heartbeatInterval = Math.min(heartbeat_interval, 5)
 
         if (this.keepAliver) clearInterval(this.keepAliver)
