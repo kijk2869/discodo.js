@@ -1,4 +1,4 @@
-name Node.js package
+name: Node.js package
 
 on:
   push:
