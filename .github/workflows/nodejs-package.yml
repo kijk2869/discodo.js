@@ -1,11 +1,15 @@
+name Node.js package
+
 on:
   push:
   pull_request:
 
 jobs:
-  eslint:
-    name: ESLint
+  lint:
+    name: lint
+    
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v1
 
@@ -14,10 +18,10 @@ jobs:
       with:
         node-version: 12
 
-    - name: npm install
+    - name: Install dependencies
       run: npm install
 
-    - name: ESLint
+    - name: Lint with ESLint
       uses: icrawl/action-eslint@v1
       with:
         custom-glob: src
