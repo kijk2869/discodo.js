@@ -1,6 +1,6 @@
 {
   "name": "discodo.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Node.js wrapper of Discodo",
   "main": "./src/index.js",
   "repository": "https://github.com/kijk2869/discodo.js.git",
@@ -17,8 +17,8 @@
   },
   "dependencies": {
     "node-fetch": "^2.6.1",
-    "ws": "^7.4.3",
-    "node-version-compare": "^1.0.3"
+    "node-version-compare": "^1.0.3",
+    "ws": "^7.4.3"
   },
   "peerDependencies": {
     "discord.js": "^12.5.3"
