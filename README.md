@@ -19,5 +19,5 @@ Discodo.js is a Node.JS wrapper of [discodo](https://github.com/kijk2869/discodo
 **Discodo.js requires Node.js v12 or higher**
 
 ```sh
-npm i discodo.js^1.0.0
+npm i discodo.js@1.0.1
 ```
