@@ -26,21 +26,21 @@ client.on("message", async (message) => {
   }
   
   if (message.content.startsWith("!play")) {
-    VC = codo.getVC(message.guild.id, safe=true)
+    const VC = codo.getVC(message.guild.id, true)
     
     if (!VC) return await message.channel.send("Please type `!join` first.")
     
     if (VC.channel === undefined) VC.channel = message.channel
     
-    source = await VC.loadSource(message.content.substring(6))
+    const source = await VC.loadSource(message.content.substring(6))
     
-    if (source instanceof Array) return await message.channel.send(`${source.length - 1} songs except {source[0].title} added.`)
+    if (source instanceof Array) return await message.channel.send(`${source.length - 1} songs except ${source[0].title} added.`)
     
-    return await message.channel.send($`{source.title} added.`)
+    return await message.channel.send(`${source.title} added.`)
   }
   
   if (message.content.startsWith("!stop")) {
-    VC = codo.getVC(message.guild.id, safe=true)
+    const VC = codo.getVC(message.guild.id, true)
     
     if (!VC) return await message.channel.send("I'm not connected to any voice channel now.")
     
