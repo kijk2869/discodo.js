@@ -246,7 +246,7 @@ declare module "discodo.js" {
         public requestSubtitle(
             lang?: string,
             url?: string
-        ): Promise<RequestSubtitle>;
+        ): Promise<RequestSubtitle | NoSubtitle>;
         public getSubtitle(
             options: { lang?: string; url?: string },
             callback: (subtitle: Subtitle) => void
