@@ -201,6 +201,7 @@ declare module "discodo.js" {
         public get duration(): number | null;
         public get position(): string | null;
         public get remain(): number | null;
+        public get state(): number | null;
         public handleGetState(data: any): void;
         public send(op: any, data?: any): Promise<void>;
         public query(
