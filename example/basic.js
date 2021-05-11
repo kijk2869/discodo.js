@@ -22,7 +22,7 @@ client.on("message", async (message) => {
       
     await client.Audio.connect(message.member.voice.channel)
 
-    return await message.channel.send(`I Connected to <#${message.member.voice.channel.id}>`)
+    return await message.channel.send(`I Connected to ${message.member.voice.channel}`)
   }
   
   if (message.content.startsWith("!play")) {
