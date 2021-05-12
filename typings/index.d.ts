@@ -201,6 +201,7 @@ declare module "discodo.js" {
         public get duration(): number | null;
         public get position(): string | null;
         public get remain(): number | null;
+        public get state(): number | null;
         public handleGetState(data: any): void;
         public send(op: any, data?: any): Promise<void>;
         public query(
@@ -246,7 +247,7 @@ declare module "discodo.js" {
         public requestSubtitle(
             lang?: string,
             url?: string
-        ): Promise<RequestSubtitle>;
+        ): Promise<RequestSubtitle | NoSubtitle>;
         public getSubtitle(
             options: { lang?: string; url?: string },
             callback: (subtitle: Subtitle) => void
