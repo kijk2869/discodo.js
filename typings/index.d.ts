@@ -43,16 +43,14 @@ declare module "discodo.js" {
     export class AudioSource {
         constructor(VoiceClient: VoiceClient, data: json);
         public voiceClient: VoiceClient;
-        public _data: any;
         public context: json;
         public readonly _type: string;
         public readonly tag: string;
         public readonly id: string;
         public readonly title?: string;
         public readonly webpage_url?: string;
-        public readonly thumbnail?: string;
         public readonly url?: string;
-        public readonly duration?: number;
+        public readonly duration: number;
         public readonly isLive: boolean;
         public readonly uploader?: string;
         public readonly description?: string;
@@ -60,7 +58,7 @@ declare module "discodo.js" {
         public readonly asOf: number;
         public readonly chapters: json;
         public readonly related: boolean;
-        public readonly startPosition: number;
+        public readonly start_position: number;
         public readonly seekable: boolean;
         public get isInQueue(): boolean;
         public get position(): string;
@@ -201,7 +199,6 @@ declare module "discodo.js" {
         public get duration(): number | null;
         public get position(): string | null;
         public get remain(): number | null;
-        public get state(): number | null;
         public handleGetState(data: any): void;
         public send(op: any, data?: any): Promise<void>;
         public query(
@@ -247,7 +244,7 @@ declare module "discodo.js" {
         public requestSubtitle(
             lang?: string,
             url?: string
-        ): Promise<RequestSubtitle | NoSubtitle>;
+        ): Promise<RequestSubtitle>;
         public getSubtitle(
             options: { lang?: string; url?: string },
             callback: (subtitle: Subtitle) => void

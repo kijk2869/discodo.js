@@ -100,8 +100,9 @@ class DJSClient extends EventEmitter {
 
     _onVCDestroyed({ guild_id }) {
         const guild = this.client.guilds.cache.get(`${guild_id}`)
-
+		
         this.voiceState(guild, null)
+        this.voiceClients.delete(`${guild_id}`)
     }
 
     _onAnyNodeEvent(event, data) {
