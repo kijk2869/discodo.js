@@ -72,8 +72,7 @@ class VoiceClient extends EventEmitter {
     stop() {
         if (this.syncTask) clearInterval(this.syncTask)
 
-        const VC = this.node.voiceClients[this.guildID]
-        if (VC === this) delete this.node.voiceClients[this.guildID]
+        if (this.node.voiceClients.has(this.guildID)) this.node.voiceClients.delete(this.guildID)
     }
 
     _VC_CHANNEL_EDITED({ channel_id }) {
