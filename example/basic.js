@@ -4,6 +4,8 @@ const { DJSClient } = require("discodo.js")
 const client = new Client()
 const codo = new DJSClient(client)
 
+client.Audio = codo
+
 client.on("ready", async () => {
   console.log(`I logged in as ${client.user.username} (${client.user.id})`)
     
