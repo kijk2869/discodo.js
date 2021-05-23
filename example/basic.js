@@ -4,6 +4,8 @@ const { DJSClient } = require("discodo.js")
 const client = new Client()
 const codo = new DJSClient(client)
 
+client.Audio = codo
+
 client.on("ready", async () => {
   console.log(`I logged in as ${client.user.username} (${client.user.id})`)
     
@@ -19,6 +21,7 @@ client.on("message", async (message) => {
   
   if (message.content.startsWith("!join")) {
     if (!message.member.voice.channel) return await message.channel.send("Join the voice channel first.")
+    if(!message.content.substring(6)) return await message.channel.send("Please enter a song url or query to search.")
       
     await client.Audio.connect(message.member.voice.channel)
 
