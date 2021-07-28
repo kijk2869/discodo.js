@@ -1,7 +1,7 @@
 const EventEmitter = require("./util/emitter.js")
 const Websocket = require("ws")
 const { performance } = require("perf_hooks")
-const compare = require('node-version-compare')
+const compare = require("node-version-compare")
 
 class NodeConnection extends EventEmitter {
     /**
