@@ -1,5 +1,5 @@
 const { Client, Intents } = require("discord.js")
-const { DJSClient } = require("../src")
+const { DJSClient } = require("discodo.js")
 
 const client = new Client({
     intents: Object.keys(Intents.FLAGS)
