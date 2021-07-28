@@ -1,6 +1,7 @@
-const { version, Collection } = require("discord.js")
+const { Collection } = require("discord.js")
 const EventEmitter = require("./util/emitter.js")
 const OriginNode = require("./node.js")
+const { getVoiceConnection } = require("@discordjs/voice")
 
 class NodeClient extends OriginNode {
     async onResumed(Data) {
@@ -32,7 +33,7 @@ class DJSClient extends EventEmitter {
     constructor(client) {
         super()
 
-        if (!version.startsWith("12")) throw new Error("Discodo.js is only working on discord.js v12.")
+        // if (!version.startsWith("12")) throw new Error("Discodo.js is only working on discord.js v12.")
 
         /**
          * @type {import("discord.js").Client}
@@ -142,6 +143,9 @@ class DJSClient extends EventEmitter {
      * @returns 
      */
     async connect(channel, node = null) {
+        /**
+         * @type {import('discord.js').VoiceChannel}
+         */
         channel = this.client.channels.resolve(channel)
 
         if (channel.type !== "voice" && channel.type !== "")
@@ -172,7 +176,7 @@ class DJSClient extends EventEmitter {
                 .catch(e => {
                     if (`${e}` !== "The voice connection is timed out.") return
 
-                    channel.leave()
+                    getVoiceConnection(channel.guild.id).destroy()
 
                     throw e
                 })

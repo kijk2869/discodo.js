@@ -16,14 +16,16 @@
     "url": "https://github.com/kijk2869/discodo.js/issues"
   },
   "dependencies": {
+    "@discordjs/voice": "^0.5.5",
     "node-fetch": "^2.6.1",
     "node-version-compare": "^1.0.3",
     "ws": "^7.4.3"
   },
   "peerDependencies": {
-    "discord.js": "^12.5.3"
+    "discord.js": "^13.0.0"
   },
   "devDependencies": {
+    "discord.js": "discordjs/discord.js",
     "eslint": "^7.23.0"
   },
   "types": "./typings/index.d.ts"

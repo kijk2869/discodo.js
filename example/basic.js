@@ -1,7 +1,9 @@
-const { Client } = require("discord.js")
-const { DJSClient } = require("discodo.js")
+const { Client, Intents } = require("discord.js")
+const { DJSClient } = require("../src")
 
-const client = new Client()
+const client = new Client({
+    intents: Object.keys(Intents.FLAGS)
+})
 const codo = new DJSClient(client)
 
 client.Audio = codo
@@ -9,7 +11,7 @@ client.Audio = codo
 client.on("ready", async () => {
     console.log(`I logged in as ${client.user.username} (${client.user.id})`)
 
-    client.Audio.registerNode({ host: "localhost", port: 8000 })
+    await client.Audio.registerNode({ host: "localhost", port: 8000 })
 })
 
 codo.on("SOURCE_START", async (VC, { source }) => {
