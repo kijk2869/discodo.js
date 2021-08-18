@@ -18,7 +18,7 @@
   "dependencies": {
     "node-fetch": "^2.6.1",
     "node-version-compare": "^1.0.3",
-    "ws": "^7.4.3"
+    "ws": "^8.2.0"
   },
   "peerDependencies": {
     "discord.js": "^12.5.3"
