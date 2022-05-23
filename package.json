@@ -24,7 +24,7 @@
     "discord.js": "^12.5.3"
   },
   "devDependencies": {
-    "eslint": "^7.23.0"
+    "eslint": "^8.16.0"
   },
   "types": "./typings/index.d.ts"
 }
